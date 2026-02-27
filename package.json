@@ -1,0 +1,9 @@
+{
+  "name": "pepper",
+  "version": "1.0.0",
+  "description": "Pepper · Paceline Chief of Staff — Daily Briefing Bot",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  }
+}
