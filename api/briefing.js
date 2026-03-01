@@ -120,6 +120,37 @@ export default async function handler(req, res) {
         },
       },
       { type: 'divider' },
+      // ── Backlog quick-access block ──────────────────────────────────────
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `*🗂 Backlog*  _Groom · Review · Add_`,
+        },
+      },
+      {
+        type: 'actions',
+        elements: [
+          {
+            type: 'button',
+            text: { type: 'plain_text', text: '☀️ Briefing', emoji: true },
+            url: 'https://pepper-backlog.vercel.app?mode=briefing',
+            style: 'primary',
+          },
+          {
+            type: 'button',
+            text: { type: 'plain_text', text: '🌿 Morning Groom', emoji: true },
+            url: 'https://pepper-backlog.vercel.app?mode=groom',
+          },
+          {
+            type: 'button',
+            text: { type: 'plain_text', text: '＋ Add Task', emoji: true },
+            url: 'https://pepper-backlog.vercel.app',
+          },
+        ],
+      },
+      // ───────────────────────────────────────────────────────────────────
+      { type: 'divider' },
       {
         type: 'context',
         elements: [
