@@ -1,5 +1,6 @@
 // Pepper · Slack Chat Handler
 // Receives DMs and @mentions, responds via Claude
+// Supports URL fetching — share a link and Pepper will read it
 
 export const config = {
   maxDuration: 30,
@@ -8,6 +9,8 @@ export const config = {
 const SYSTEM_PROMPT = `You are Pepper, the Chief of Staff to John B Lin, COO of Paceline (paceline.fit). You are a trusted senior operator — not an assistant. You think ahead, protect John's time, surface what's slipping, and draft the comms and plans that keep things moving.
 
 You are responding via Slack. Keep responses appropriately concise for Slack — use formatting, bullets, and line breaks naturally. For drafts (Slack messages, emails), present them ready-to-use. For recommendations, be direct and specific.
+
+When John shares a URL, you will receive the page content inline. Use it to summarize, extract action items, draft a response, or whatever is most useful given the context.
 
 About Paceline:
 Paceline is a health and fitness rewards platform. Users earn "Pacepoints" by hitting weekly heart-rate-based activity goals tracked via wearables, redeemed in a marketplace. Tagline: "Healthy Feels Good."
@@ -46,6 +49,59 @@ Response style:
 
 const conversations = {};
 
+// Extract URLs from message text
+function extractUrls(text) {
+  // Slack wraps URLs in <url> or <url|label> format, also catch plain URLs
+  const slackUrlRegex = /<(https?:\/\/[^|>]+)(?:\|[^>]*)?>|https?:\/\/[^\s]+/g;
+  const urls = [];
+  let match;
+  while ((match = slackUrlRegex.exec(text)) !== null) {
+    urls.push(match[1] || match[0]);
+  }
+  return [...new Set(urls)]; // dedupe
+}
+
+// Fetch and extract text content from a URL
+async function fetchUrlContent(url) {
+  try {
+    const res = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; Pepper-CoS/1.0)',
+        'Accept': 'text/html,application/xhtml+xml,text/plain',
+      },
+      signal: AbortSignal.timeout(8000),
+    });
+
+    if (!res.ok) return `[Could not fetch ${url}: HTTP ${res.status}]`;
+
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('text') && !contentType.includes('json')) {
+      return `[${url} is a non-text file (${contentType}) — cannot read]`;
+    }
+
+    const html = await res.text();
+
+    // Strip HTML tags and clean up whitespace
+    const text = html
+      .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    // Truncate to ~6000 chars to stay within context limits
+    return text.length > 6000 ? text.slice(0, 6000) + '… [truncated]' : text;
+
+  } catch (err) {
+    return `[Could not fetch ${url}: ${err.message}]`;
+  }
+}
+
 async function postToSlack(channel, text, thread_ts) {
   const body = { channel, text, unfurl_links: false };
   if (thread_ts) body.thread_ts = thread_ts;
@@ -82,15 +138,27 @@ export default async function handler(req, res) {
   if (!isDM && !isMention) return res.status(200).json({ ok: true });
 
   const botUserId = process.env.SLACK_BOT_USER_ID || '';
-  const text = (event.text || '').replace(`<@${botUserId}>`, '').trim();
-  if (!text) return res.status(200).json({ ok: true });
+  const rawText = (event.text || '').replace(`<@${botUserId}>`, '').trim();
+  if (!rawText) return res.status(200).json({ ok: true });
 
   const channelId = event.channel;
   const threadTs = event.thread_ts || event.ts;
   const conversationKey = `${channelId}:${threadTs}`;
 
+  // Fetch any URLs found in the message
+  const urls = extractUrls(rawText);
+  let messageContent = rawText;
+
+  if (urls.length > 0) {
+    const fetched = await Promise.all(urls.map(async (url) => {
+      const content = await fetchUrlContent(url);
+      return `\n\n[Content from ${url}]:\n${content}`;
+    }));
+    messageContent = rawText + fetched.join('');
+  }
+
   if (!conversations[conversationKey]) conversations[conversationKey] = [];
-  conversations[conversationKey].push({ role: 'user', content: text });
+  conversations[conversationKey].push({ role: 'user', content: messageContent });
   if (conversations[conversationKey].length > 20) {
     conversations[conversationKey] = conversations[conversationKey].slice(-20);
   }
