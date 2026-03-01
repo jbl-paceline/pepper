@@ -405,24 +405,12 @@ header {
   gap: 2px;
   white-space: nowrap;
 }
-.card-actions {
-  display: none;
-  gap: 4px;
-}
-.card:hover .card-actions { display: flex; }
-.card-act-btn {
-  padding: 2px 7px;
-  border-radius: 4px;
-  border: 1px solid var(--tan);
-  background: transparent;
+.card-tap-hint {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 8px;
-  color: var(--muted);
-  cursor: pointer;
-  transition: all 0.1s;
+  color: var(--tan);
+  letter-spacing: 0.5px;
 }
-.card-act-btn:hover { border-color: var(--rust); color: var(--rust); }
-.card-act-btn.del:hover { background: var(--rust); color: white; border-color: var(--rust); }
 
 /* ─── KANBAN VIEW ────────────────────────── */
 #kanbanView {
@@ -906,6 +894,18 @@ textarea { resize: none; height: 68px; }
   gap: 8px;
   margin-top: 18px;
 }
+.btn-delete {
+  padding: 12px 18px;
+  background: transparent;
+  border: 1px solid var(--rust);
+  border-radius: 8px;
+  font-family: 'Lato', sans-serif;
+  font-size: 14px;
+  color: var(--rust);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-delete:active { background: var(--rust); color: white; }
 .btn-cancel {
   padding: 12px 18px;
   background: var(--paper);
@@ -1173,8 +1173,9 @@ textarea { resize: none; height: 68px; }
       </div>
     </div>
     <div class="modal-actions">
+      <button class="btn-delete" onclick="deleteFromEdit()">Delete</button>
       <button class="btn-cancel" onclick="closeModal('editModal')">Cancel</button>
-      <button class="btn-save" onclick="saveEdit()">Save Changes</button>
+      <button class="btn-save" onclick="saveEdit()">Save</button>
     </div>
   </div>
 </div>
@@ -1187,6 +1188,7 @@ const GROOM_KEY = 'pepper-groom-sessions';
 let tasks = [];
 let groomSessions = {}; // { 'YYYY-MM-DD-AM': timestamp, 'YYYY-MM-DD-PM': timestamp }
 let draggedId = null;
+let dragMoved = false;
 let selectedAddQ = 'q2';
 let currentView = 'matrix';
 let groomQueue = [];
@@ -1361,14 +1363,12 @@ function buildCard(task) {
       <div class="card-tags">
         ${task.tag ? `<span class="tag">${esc(task.tag)}</span>` : ''}
       </div>
-      <div style="display:flex;align-items:center;gap:6px">
-        ${sl ? `<span class="stale-badge">⏳ ${sl}</span>` : ''}
-        <div class="card-actions">
-          <button class="card-act-btn" onclick="openEdit('${task.id}')">edit</button>
-          <button class="card-act-btn del" onclick="deleteTask('${task.id}')">×</button>
-        </div>
-      </div>
+      ${sl ? `<span class="stale-badge">⏳ ${sl}</span>` : '<span class="card-tap-hint">tap to edit</span>'}
     </div>`;
+
+  div.addEventListener('click', (e) => {
+    if (!dragMoved) openEdit(task.id);
+  });
   return div;
 }
 
@@ -1379,10 +1379,16 @@ function esc(s) {
 // ─── DRAG & DROP ─────────────────────────────────
 function onDragStart(e, id) {
   draggedId = id;
+  dragMoved = false;
   setTimeout(() => e.target.classList.add('dragging'), 0);
   e.dataTransfer.effectAllowed = 'move';
 }
-function onDragEnd(e) { e.target.classList.remove('dragging'); draggedId = null; }
+function onDragEnd(e) {
+  e.target.classList.remove('dragging');
+  dragMoved = true;
+  // Reset after a tick so the click event (which fires after dragend) is blocked
+  setTimeout(() => { dragMoved = false; draggedId = null; }, 50);
+}
 function onDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
 function onDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
 function onDrop(e, q) {
@@ -1400,6 +1406,16 @@ function onDrop(e, q) {
 }
 
 // ─── TASKS CRUD ──────────────────────────────────
+function deleteFromEdit() {
+  const id = document.getElementById('editId').value;
+  if (!id) return;
+  // Simple confirm — feels native on mobile
+  const title = document.getElementById('editTitle').value || 'this task';
+  if (!confirm(`Delete "${title}"?`)) return;
+  deleteTask(id);
+  closeModal('editModal');
+}
+
 function deleteTask(id) {
   tasks = tasks.filter(t => t.id !== id);
   saveData();
