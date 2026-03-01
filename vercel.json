@@ -3,6 +3,14 @@
     {
       "path": "/api/briefing",
       "schedule": "0 15 * * 1-5"
+    },
+    {
+      "path": "/api/cron/backlog-groom",
+      "schedule": "0 17 * * 1-5"
+    },
+    {
+      "path": "/api/cron/backlog-groom",
+      "schedule": "0 22 * * 1-5"
     }
   ]
 }

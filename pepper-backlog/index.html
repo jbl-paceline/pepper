@@ -1,0 +1,1783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#f5f0e8">
+<title>Pepper Backlog</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=IBM+Plex+Mono:wght@400;500&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --cream: #f5f0e8;
+  --warm-white: #faf8f3;
+  --paper: #ede8dc;
+  --tan: #d4c9b0;
+  --brown: #8b7355;
+  --dark-brown: #4a3728;
+  --rust: #c0622f;
+  --sage: #7a8c6e;
+  --ink: #2c2416;
+  --muted: #9a8c7a;
+  --gold: #c9973a;
+  --dust: #e8a020;
+  --q1-bg: #f8ece3; --q1-accent: #c0622f;
+  --q2-bg: #eaf0e6; --q2-accent: #7a8c6e;
+  --q3-bg: #fdf4e3; --q3-accent: #c9973a;
+  --q4-bg: #ece8e0; --q4-accent: #9a8c7a;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
+}
+
+html, body {
+  height: 100%;
+  overscroll-behavior: none;
+}
+
+body {
+  background: var(--cream);
+  font-family: 'Lato', sans-serif;
+  color: var(--ink);
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── HEADER ─────────────────────────────── */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  padding: calc(var(--safe-top) + 12px) 16px 12px;
+  background: rgba(245,240,232,0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--tan);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.logo {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+.logo h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--dark-brown);
+  letter-spacing: -0.3px;
+}
+.logo .sub {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 1px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--tan);
+  background: var(--paper);
+  color: var(--dark-brown);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.icon-btn:active { transform: scale(0.94); background: var(--tan); }
+
+.add-btn {
+  height: 36px;
+  padding: 0 16px;
+  background: var(--rust);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Lato', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.15s;
+}
+.add-btn:active { transform: scale(0.96); background: #a8521f; }
+
+/* ─── VIEWS CONTAINER ─────────────────────── */
+#app {
+  flex: 1;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.view {
+  display: none;
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+.view.active { display: flex; flex-direction: column; }
+
+/* ─── PEPPER BANNER ──────────────────────── */
+.pepper-banner {
+  margin: 12px 16px 0;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, var(--dark-brown) 0%, #6b4e37 100%);
+  border-radius: 10px;
+  color: var(--cream);
+  position: relative;
+  overflow: hidden;
+}
+.pepper-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+.banner-tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  opacity: 0.65;
+  margin-bottom: 4px;
+}
+.banner-msg {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 14px;
+  line-height: 1.4;
+  margin-bottom: 10px;
+}
+.banner-actions {
+  display: flex;
+  gap: 8px;
+}
+.banner-btn {
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-family: 'Lato', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.15s;
+}
+.banner-btn:active { transform: scale(0.96); }
+.banner-btn.primary { background: var(--rust); color: white; }
+.banner-btn.secondary { background: rgba(255,255,255,0.15); color: var(--cream); border: 1px solid rgba(255,255,255,0.2); }
+
+/* ─── MATRIX VIEW ────────────────────────── */
+#matrixView {
+  padding: 12px 0 0;
+}
+
+.axis-labels-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 16px 4px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.matrix-with-side {
+  display: flex;
+  gap: 0;
+  padding: 0 16px;
+  flex: 1;
+}
+
+.side-axis {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0 6px 0 0;
+  width: 14px;
+  flex-shrink: 0;
+}
+.side-axis span {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+.quadrant-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 3px;
+  background: var(--tan);
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--tan);
+}
+
+.quadrant {
+  background: var(--warm-white);
+  padding: 12px;
+  min-height: 180px;
+  position: relative;
+  transition: background 0.15s;
+}
+.quadrant.drag-over { background: rgba(201,151,58,0.12) !important; }
+.quadrant.q1 { background: var(--q1-bg); }
+.quadrant.q2 { background: var(--q2-bg); }
+.quadrant.q3 { background: var(--q3-bg); }
+.quadrant.q4 { background: var(--q4-bg); }
+
+.q-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1.5px solid;
+}
+.q1 .q-header { border-color: var(--q1-accent); }
+.q2 .q-header { border-color: var(--q2-accent); }
+.q3 .q-header { border-color: var(--q3-accent); }
+.q4 .q-header { border-color: var(--q4-accent); }
+
+.q-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--dark-brown);
+  line-height: 1.2;
+}
+.q-sub {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+.q1 .q-sub { color: var(--q1-accent); }
+.q2 .q-sub { color: var(--q2-accent); }
+.q3 .q-sub { color: var(--q3-accent); }
+.q4 .q-sub { color: var(--q4-accent); }
+
+.q-count {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  color: var(--muted);
+  background: rgba(44,36,22,0.08);
+  border-radius: 8px;
+  padding: 1px 7px;
+  white-space: nowrap;
+}
+
+.cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ─── CARD ────────────────────────────────── */
+.card {
+  background: white;
+  border-radius: 6px;
+  padding: 9px 11px;
+  border: 1px solid rgba(212,201,176,0.8);
+  cursor: grab;
+  position: relative;
+  user-select: none;
+  -webkit-user-select: none;
+  box-shadow: 0 1px 3px rgba(44,36,22,0.06);
+  transition: box-shadow 0.15s, transform 0.15s;
+  animation: cardIn 0.2s ease both;
+}
+@keyframes cardIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.card:active { box-shadow: 0 4px 14px rgba(44,36,22,0.14); }
+.card.dragging { opacity: 0.35; cursor: grabbing; }
+.card.stale-1 { border-left: 3px solid var(--gold); }
+.card.stale-2 { border-left: 3px solid var(--rust); }
+
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 5px;
+}
+.card-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--dark-brown);
+  line-height: 1.35;
+  flex: 1;
+}
+.size-badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 8px;
+  font-weight: 500;
+  padding: 2px 5px;
+  border-radius: 3px;
+  border: 1px solid;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.size-xs { color: var(--sage); border-color: var(--sage); background: rgba(122,140,110,0.08); }
+.size-s  { color: var(--brown); border-color: var(--brown); background: rgba(139,115,85,0.08); }
+.size-m  { color: var(--gold); border-color: var(--gold); background: rgba(201,151,58,0.08); }
+.size-l  { color: var(--rust); border-color: var(--rust); background: rgba(192,98,47,0.1); }
+.size-xl { color: var(--dark-brown); border-color: var(--dark-brown); background: rgba(74,55,40,0.1); }
+
+.card-note {
+  font-size: 10px;
+  color: var(--muted);
+  font-style: italic;
+  line-height: 1.4;
+  margin-bottom: 5px;
+}
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+.card-tags {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 8px;
+  padding: 1px 6px;
+  border-radius: 8px;
+  background: rgba(44,36,22,0.06);
+  color: var(--muted);
+}
+.stale-badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 8px;
+  color: var(--dust);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  white-space: nowrap;
+}
+.card-actions {
+  display: none;
+  gap: 4px;
+}
+.card:hover .card-actions { display: flex; }
+.card-act-btn {
+  padding: 2px 7px;
+  border-radius: 4px;
+  border: 1px solid var(--tan);
+  background: transparent;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 8px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.1s;
+}
+.card-act-btn:hover { border-color: var(--rust); color: var(--rust); }
+.card-act-btn.del:hover { background: var(--rust); color: white; border-color: var(--rust); }
+
+/* ─── KANBAN VIEW ────────────────────────── */
+#kanbanView {
+  padding: 12px 16px;
+  gap: 12px;
+  flex-direction: column;
+}
+.kanban-cols {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 8px;
+}
+.kanban-col {
+  flex: 0 0 220px;
+  background: var(--paper);
+  border-radius: 10px;
+  padding: 12px;
+  border: 1px solid var(--tan);
+  min-height: 200px;
+}
+.kanban-col-header {
+  font-family: 'Playfair Display', serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--dark-brown);
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--tan);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ─── BRIEFING VIEW ──────────────────────── */
+#briefingView {
+  padding: 16px;
+  gap: 16px;
+  flex-direction: column;
+}
+.briefing-header {
+  text-align: center;
+  padding: 8px 0 4px;
+}
+.briefing-header .date {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.briefing-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-style: italic;
+  color: var(--dark-brown);
+  margin-top: 4px;
+}
+.briefing-section h3 {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.briefing-section h3::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--tan);
+}
+.briefing-card {
+  background: white;
+  border-radius: 8px;
+  padding: 12px 14px;
+  border: 1px solid var(--tan);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.briefing-card .bc-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+.bc-q1 { background: var(--q1-accent); }
+.bc-q2 { background: var(--q2-accent); }
+.bc-q3 { background: var(--q3-accent); }
+.briefing-card .bc-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--dark-brown);
+  flex: 1;
+}
+.briefing-card .bc-meta {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+.briefing-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.stat-card {
+  background: white;
+  border-radius: 8px;
+  padding: 12px;
+  border: 1px solid var(--tan);
+  text-align: center;
+}
+.stat-card .stat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--dark-brown);
+  line-height: 1;
+}
+.stat-card .stat-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.stale-warning {
+  background: rgba(201,151,58,0.12);
+  border: 1px solid rgba(201,151,58,0.4);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: var(--dark-brown);
+  margin-bottom: 4px;
+}
+.stale-warning strong { color: var(--gold); }
+
+/* ─── GROOMING VIEW ──────────────────────── */
+#groomView {
+  padding: 16px;
+  align-items: center;
+  justify-content: flex-start;
+}
+.groom-progress {
+  width: 100%;
+  margin-bottom: 20px;
+}
+.groom-progress-bar {
+  height: 4px;
+  background: var(--tan);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.groom-progress-fill {
+  height: 100%;
+  background: var(--sage);
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+.groom-progress-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: center;
+}
+.groom-card-container {
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
+}
+.groom-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid var(--tan);
+  box-shadow: 0 4px 20px rgba(44,36,22,0.1);
+  margin-bottom: 20px;
+}
+.groom-card-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--dark-brown);
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+.groom-card-note {
+  font-size: 13px;
+  color: var(--muted);
+  font-style: italic;
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+.groom-section-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--brown);
+  margin-bottom: 8px;
+}
+.groom-q-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.groom-q-opt {
+  padding: 8px 10px;
+  border-radius: 7px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.3;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.15s;
+}
+.groom-q-opt:active { transform: scale(0.96); }
+.groom-q-opt.q1 { background: var(--q1-bg); color: var(--q1-accent); }
+.groom-q-opt.q2 { background: var(--q2-bg); color: var(--q2-accent); }
+.groom-q-opt.q3 { background: var(--q3-bg); color: var(--q3-accent); }
+.groom-q-opt.q4 { background: var(--q4-bg); color: var(--q4-accent); }
+.groom-q-opt.selected { border-color: currentColor; }
+
+.groom-size-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.groom-size-opt {
+  flex: 1;
+  min-width: 40px;
+  padding: 7px 4px;
+  border-radius: 6px;
+  border: 1.5px solid var(--tan);
+  text-align: center;
+  cursor: pointer;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--muted);
+  background: var(--cream);
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.15s;
+}
+.groom-size-opt.selected {
+  border-color: var(--dark-brown);
+  color: var(--dark-brown);
+  background: white;
+  font-weight: 700;
+}
+
+.groom-actions {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
+}
+.groom-btn {
+  flex: 1;
+  padding: 13px;
+  border-radius: 10px;
+  border: none;
+  font-family: 'Lato', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.15s;
+}
+.groom-btn:active { transform: scale(0.97); }
+.groom-btn.confirm { background: var(--sage); color: white; }
+.groom-btn.skip { background: var(--paper); color: var(--muted); border: 1px solid var(--tan); }
+.groom-btn.drop { background: var(--q4-bg); color: var(--q4-accent); border: 1px solid var(--tan); }
+
+.groom-done {
+  text-align: center;
+  padding: 40px 20px;
+}
+.groom-done .check { font-size: 48px; margin-bottom: 12px; }
+.groom-done h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-style: italic;
+  color: var(--dark-brown);
+  margin-bottom: 8px;
+}
+.groom-done p {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+.groom-done button {
+  padding: 11px 24px;
+  background: var(--dark-brown);
+  color: var(--cream);
+  border: none;
+  border-radius: 8px;
+  font-family: 'Lato', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* ─── BOTTOM NAV ─────────────────────────── */
+.bottom-nav {
+  position: sticky;
+  bottom: 0;
+  z-index: 50;
+  background: rgba(245,240,232,0.97);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-top: 1px solid var(--tan);
+  display: flex;
+  padding-bottom: var(--safe-bottom);
+}
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 4px 8px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  gap: 3px;
+  border: none;
+  background: transparent;
+  transition: all 0.15s;
+  position: relative;
+}
+.nav-item:active { transform: scale(0.93); }
+.nav-icon { font-size: 20px; line-height: 1; }
+.nav-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  transition: color 0.15s;
+}
+.nav-item.active .nav-label { color: var(--rust); }
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 2px;
+  background: var(--rust);
+  border-radius: 0 0 2px 2px;
+}
+.nav-badge {
+  position: absolute;
+  top: 7px;
+  right: calc(50% - 16px);
+  background: var(--rust);
+  color: white;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 8px;
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 1px 5px;
+  min-width: 16px;
+  text-align: center;
+}
+
+/* ─── MODAL ──────────────────────────────── */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(44,36,22,0.5);
+  z-index: 200;
+  align-items: flex-end;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--warm-white);
+  border-radius: 16px 16px 0 0;
+  padding: 20px 20px calc(20px + var(--safe-bottom));
+  width: 100%;
+  max-width: 540px;
+  box-shadow: 0 -8px 40px rgba(44,36,22,0.2);
+  animation: slideUp 0.25s cubic-bezier(0.32,0.72,0,1) both;
+  max-height: 92dvh;
+  overflow-y: auto;
+}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+.modal-handle {
+  width: 36px;
+  height: 4px;
+  background: var(--tan);
+  border-radius: 2px;
+  margin: 0 auto 16px;
+}
+.modal h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  color: var(--dark-brown);
+  margin-bottom: 16px;
+}
+
+.form-row { margin-bottom: 14px; }
+label {
+  display: block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--brown);
+  margin-bottom: 5px;
+}
+input[type=text], textarea, select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--tan);
+  border-radius: 7px;
+  font-family: 'Lato', sans-serif;
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--cream);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: border-color 0.2s;
+}
+input[type=text]:focus, textarea:focus, select:focus {
+  border-color: var(--brown);
+  background: white;
+}
+textarea { resize: none; height: 68px; }
+
+.form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+
+.quadrant-select { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.q-option {
+  padding: 9px 8px;
+  border-radius: 7px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.3;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.15s;
+}
+.q-option:active { transform: scale(0.96); }
+.q-option.q1 { background: var(--q1-bg); color: var(--q1-accent); }
+.q-option.q2 { background: var(--q2-bg); color: var(--q2-accent); }
+.q-option.q3 { background: var(--q3-bg); color: var(--q3-accent); }
+.q-option.q4 { background: var(--q4-bg); color: var(--q4-accent); }
+.q-option.selected { border-color: currentColor; }
+
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 18px;
+}
+.btn-cancel {
+  padding: 12px 18px;
+  background: var(--paper);
+  border: 1px solid var(--tan);
+  border-radius: 8px;
+  font-family: 'Lato', sans-serif;
+  font-size: 14px;
+  color: var(--muted);
+  cursor: pointer;
+}
+.btn-save {
+  flex: 1;
+  padding: 12px;
+  background: var(--rust);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Lato', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+/* ─── EDIT MODAL ─────────────────────────── */
+#editModal .modal { padding-bottom: calc(20px + var(--safe-bottom)); }
+
+/* ─── LOADING ────────────────────────────── */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+
+/* ─── EMPTY STATE ────────────────────────── */
+.empty-q {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  color: var(--muted);
+  text-align: center;
+  padding: 16px 8px;
+  opacity: 0.6;
+  letter-spacing: 0.5px;
+}
+
+/* ─── SCROLLBAR ──────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--tan); border-radius: 2px; }
+
+/* ─── DESKTOP TWEAKS ─────────────────────── */
+@media (min-width: 600px) {
+  header { padding: 16px 24px; }
+  .logo h1 { font-size: 20px; }
+  #matrixView { padding: 16px; }
+  .quadrant { min-height: 220px; padding: 16px; }
+  .q-title { font-size: 14px; }
+  .card-title { font-size: 13px; }
+  .modal { border-radius: 12px; max-width: 460px; margin: auto; }
+  .modal-overlay.open { align-items: center; }
+  .groom-card-container { max-width: 420px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <h1>Pepper Backlog</h1>
+    <div class="sub" id="headerSub">Personal OS</div>
+  </div>
+  <div class="header-right">
+    <div class="icon-btn" onclick="showView('groom')" title="Start Grooming" id="groomIconBtn" style="position:relative">
+      🌿
+      <span class="nav-badge" id="groomBadgeHeader" style="display:none"></span>
+    </div>
+    <button class="add-btn" onclick="openModal()">＋ Add</button>
+  </div>
+</header>
+
+<div id="app">
+
+  <!-- ── MATRIX VIEW ── -->
+  <div id="matrixView" class="view active">
+    <div id="pepperBanner" style="display:none">
+      <!-- injected by JS -->
+    </div>
+    <div class="axis-labels-row">
+      <span>← Not Urgent</span>
+      <span>Urgent →</span>
+    </div>
+    <div class="matrix-with-side">
+      <div class="side-axis">
+        <span>Important ↑</span>
+        <span>↓ Less</span>
+      </div>
+      <div class="quadrant-grid">
+        <div class="quadrant q2" ondragover="onDragOver(event)" ondrop="onDrop(event,'q2')" ondragleave="onDragLeave(event)">
+          <div class="q-header">
+            <div><div class="q-title">Plan & Build</div><div class="q-sub">Important · Not Urgent</div></div>
+            <div class="q-count" id="cnt-q2">0</div>
+          </div>
+          <div class="cards-container" id="cards-q2"></div>
+          <div class="empty-q" id="empty-q2" style="display:none">Drop here</div>
+        </div>
+        <div class="quadrant q1" ondragover="onDragOver(event)" ondrop="onDrop(event,'q1')" ondragleave="onDragLeave(event)">
+          <div class="q-header">
+            <div><div class="q-title">Do First</div><div class="q-sub">Important · Urgent</div></div>
+            <div class="q-count" id="cnt-q1">0</div>
+          </div>
+          <div class="cards-container" id="cards-q1"></div>
+          <div class="empty-q" id="empty-q1" style="display:none">Drop here</div>
+        </div>
+        <div class="quadrant q4" ondragover="onDragOver(event)" ondrop="onDrop(event,'q4')" ondragleave="onDragLeave(event)">
+          <div class="q-header">
+            <div><div class="q-title">Someday</div><div class="q-sub">Low stakes · Low rush</div></div>
+            <div class="q-count" id="cnt-q4">0</div>
+          </div>
+          <div class="cards-container" id="cards-q4"></div>
+          <div class="empty-q" id="empty-q4" style="display:none">Drop here</div>
+        </div>
+        <div class="quadrant q3" ondragover="onDragOver(event)" ondrop="onDrop(event,'q3')" ondragleave="onDragLeave(event)">
+          <div class="q-header">
+            <div><div class="q-title">Delegate</div><div class="q-sub">Urgent · Not Important</div></div>
+            <div class="q-count" id="cnt-q3">0</div>
+          </div>
+          <div class="cards-container" id="cards-q3"></div>
+          <div class="empty-q" id="empty-q3" style="display:none">Drop here</div>
+        </div>
+      </div>
+    </div>
+    <div style="height: 16px"></div>
+  </div>
+
+  <!-- ── KANBAN VIEW ── -->
+  <div id="kanbanView" class="view">
+    <div class="kanban-cols" id="kanbanCols"></div>
+  </div>
+
+  <!-- ── BRIEFING VIEW ── -->
+  <div id="briefingView" class="view">
+    <div class="briefing-header">
+      <div class="date" id="briefingDate"></div>
+      <h2 id="briefingGreeting">Daily Briefing</h2>
+    </div>
+    <div id="briefingContent"></div>
+    <div style="height:12px"></div>
+  </div>
+
+  <!-- ── GROOMING VIEW ── -->
+  <div id="groomView" class="view">
+    <div id="groomContent"></div>
+  </div>
+
+</div>
+
+<!-- ── BOTTOM NAV ── -->
+<nav class="bottom-nav">
+  <button class="nav-item active" onclick="showView('matrix')" id="nav-matrix">
+    <span class="nav-icon">⊞</span>
+    <span class="nav-label">Matrix</span>
+  </button>
+  <button class="nav-item" onclick="showView('kanban')" id="nav-kanban">
+    <span class="nav-icon">▤</span>
+    <span class="nav-label">Kanban</span>
+  </button>
+  <button class="nav-item" onclick="showView('briefing')" id="nav-briefing">
+    <span class="nav-icon">☀</span>
+    <span class="nav-label">Briefing</span>
+  </button>
+  <button class="nav-item" onclick="showView('groom')" id="nav-groom" style="position:relative">
+    <span class="nav-icon">🌿</span>
+    <span class="nav-label">Groom</span>
+    <span class="nav-badge" id="groomBadge" style="display:none"></span>
+  </button>
+</nav>
+
+<!-- ── ADD MODAL ── -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2>New Task</h2>
+    <div class="form-row">
+      <label>Title</label>
+      <input type="text" id="taskTitle" placeholder="What needs doing?">
+    </div>
+    <div class="form-row">
+      <label>Note (optional)</label>
+      <textarea id="taskNote" placeholder="Context, links, blockers…"></textarea>
+    </div>
+    <div class="form-row-2">
+      <div>
+        <label>T-Shirt Size</label>
+        <select id="taskSize">
+          <option value="xs">XS · 1–2 hrs</option>
+          <option value="s">S · half day</option>
+          <option value="m" selected>M · 1–2 days</option>
+          <option value="l">L · a week</option>
+          <option value="xl">XL · 2+ weeks</option>
+        </select>
+      </div>
+      <div>
+        <label>Tag</label>
+        <input type="text" id="taskTag" placeholder="work, health…">
+      </div>
+    </div>
+    <div class="form-row">
+      <label>Quadrant</label>
+      <div class="quadrant-select" id="quadrantSelect">
+        <div class="q-option q2 selected" data-q="q2" onclick="selectQ('q2','quadrantSelect')">Plan & Build<br><small style="font-weight:400;font-size:9px">Important · Not Urgent</small></div>
+        <div class="q-option q1" data-q="q1" onclick="selectQ('q1','quadrantSelect')">Do First<br><small style="font-weight:400;font-size:9px">Important · Urgent</small></div>
+        <div class="q-option q4" data-q="q4" onclick="selectQ('q4','quadrantSelect')">Someday<br><small style="font-weight:400;font-size:9px">Low stakes</small></div>
+        <div class="q-option q3" data-q="q3" onclick="selectQ('q3','quadrantSelect')">Delegate<br><small style="font-weight:400;font-size:9px">Urgent · Not Important</small></div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('addModal')">Cancel</button>
+      <button class="btn-save" onclick="saveTask()">Add to Backlog</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── EDIT MODAL ── -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2>Edit Task</h2>
+    <input type="hidden" id="editId">
+    <div class="form-row">
+      <label>Title</label>
+      <input type="text" id="editTitle">
+    </div>
+    <div class="form-row">
+      <label>Note</label>
+      <textarea id="editNote"></textarea>
+    </div>
+    <div class="form-row-2">
+      <div>
+        <label>T-Shirt Size</label>
+        <select id="editSize">
+          <option value="xs">XS · 1–2 hrs</option>
+          <option value="s">S · half day</option>
+          <option value="m">M · 1–2 days</option>
+          <option value="l">L · a week</option>
+          <option value="xl">XL · 2+ weeks</option>
+        </select>
+      </div>
+      <div>
+        <label>Tag</label>
+        <input type="text" id="editTag">
+      </div>
+    </div>
+    <div class="form-row">
+      <label>Move to Quadrant</label>
+      <div class="quadrant-select" id="editQuadrantSelect">
+        <div class="q-option q2" data-q="q2" onclick="selectQ('q2','editQuadrantSelect')">Plan & Build</div>
+        <div class="q-option q1" data-q="q1" onclick="selectQ('q1','editQuadrantSelect')">Do First</div>
+        <div class="q-option q4" data-q="q4" onclick="selectQ('q4','editQuadrantSelect')">Someday</div>
+        <div class="q-option q3" data-q="q3" onclick="selectQ('q3','editQuadrantSelect')">Delegate</div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('editModal')">Cancel</button>
+      <button class="btn-save" onclick="saveEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── STATE & STORAGE ──────────────────────────────
+const STORAGE_KEY = 'pepper-backlog-v2';
+const GROOM_KEY = 'pepper-groom-sessions';
+
+let tasks = [];
+let groomSessions = {}; // { 'YYYY-MM-DD-AM': timestamp, 'YYYY-MM-DD-PM': timestamp }
+let draggedId = null;
+let selectedAddQ = 'q2';
+let currentView = 'matrix';
+let groomQueue = [];
+let groomIdx = 0;
+let groomTempQ = null;
+let groomTempSize = null;
+
+// Seed data
+const SEEDS = [
+  { title: 'Pepper daily briefing pipeline', note: 'Wire backlog → morning summary', size: 'l', tag: 'build', quadrant: 'q1' },
+  { title: 'Annual health check-up', note: 'Book with Dr. Chang this month', size: 'xs', tag: 'health', quadrant: 'q1' },
+  { title: 'Q2 strategy doc', note: 'Define top 3 initiatives + OKRs', size: 'l', tag: 'work', quadrant: 'q2' },
+  { title: 'Learn Obsidian for notes', note: 'Could replace current system', size: 'm', tag: 'personal', quadrant: 'q2' },
+  { title: 'Reply to Marcus re: intro', note: '', size: 'xs', tag: 'network', quadrant: 'q3' },
+  { title: 'Expense report March', note: '', size: 'xs', tag: 'admin', quadrant: 'q3' },
+  { title: 'Read Thinking Fast & Slow', note: 'Has been on the shelf for months', size: 'm', tag: 'reading', quadrant: 'q4' },
+  { title: 'Redecorate home office', note: 'Desk, lighting, plants', size: 'xl', tag: 'home', quadrant: 'q4' },
+];
+
+// ─── PERSISTENCE ──────────────────────────────────
+async function loadData() {
+  try {
+    const r = await window.storage.get(STORAGE_KEY);
+    if (r && r.value) {
+      const parsed = JSON.parse(r.value);
+      tasks = parsed.tasks || [];
+    }
+  } catch(e) {
+    // First run or storage unavailable — seed data
+  }
+  if (!tasks.length) {
+    tasks = SEEDS.map(s => ({
+      id: uid(), ...s,
+      createdAt: Date.now() - Math.random() * 7 * 86400000, // vary ages for demo
+      lastGroomed: Date.now() - Math.random() * 5 * 86400000,
+    }));
+  }
+  try {
+    const r2 = await window.storage.get(GROOM_KEY);
+    if (r2 && r2.value) groomSessions = JSON.parse(r2.value);
+  } catch(e) {}
+  renderAll();
+  checkGroomBanner();
+  handleURLMode();
+}
+
+async function saveData() {
+  try {
+    await window.storage.set(STORAGE_KEY, JSON.stringify({ tasks, version: 2 }));
+  } catch(e) { console.warn('Storage unavailable, changes not persisted'); }
+}
+
+async function saveGroomSessions() {
+  try {
+    await window.storage.set(GROOM_KEY, JSON.stringify(groomSessions));
+  } catch(e) {}
+}
+
+// ─── UTILITIES ────────────────────────────────────
+function uid() { return Date.now().toString(36) + Math.random().toString(36).substr(2,5); }
+
+function daysSince(ts) {
+  if (!ts) return 999;
+  return (Date.now() - ts) / 86400000;
+}
+
+function staleness(task) {
+  const d = daysSince(task.lastGroomed || task.createdAt);
+  if (d >= 5) return 2;
+  if (d >= 3) return 1;
+  return 0;
+}
+
+function staleLabel(task) {
+  const d = daysSince(task.lastGroomed || task.createdAt);
+  if (d < 1) return '';
+  if (d < 2) return '1d';
+  return Math.floor(d) + 'd';
+}
+
+function todayKey(slot) { // slot: 'AM' or 'PM'
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}-${slot}`;
+}
+
+function groomSlotDone(slot) {
+  return !!groomSessions[todayKey(slot)];
+}
+
+function getGroomPendingCount() {
+  return tasks.filter(t => staleness(t) >= 1).length;
+}
+
+function shouldShowGroomBanner() {
+  const amDone = groomSlotDone('AM');
+  const pmDone = groomSlotDone('PM');
+  const hour = new Date().getHours();
+  // Show AM banner 6-12, PM banner 12-18
+  const isAMWindow = hour >= 6 && hour < 12 && !amDone;
+  const isPMWindow = hour >= 12 && hour < 18 && !pmDone;
+  return isAMWindow || isPMWindow;
+}
+
+function currentGroomSlot() {
+  return new Date().getHours() < 12 ? 'AM' : 'PM';
+}
+
+function formatDate(ts) {
+  return new Date(ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+// ─── URL DEEP LINKS ──────────────────────────────
+// Pepper can link to: ?mode=groom, ?mode=briefing, ?mode=kanban
+function handleURLMode() {
+  const params = new URLSearchParams(window.location.search);
+  const mode = params.get('mode');
+  if (mode === 'groom') showView('groom');
+  else if (mode === 'briefing') showView('briefing');
+  else if (mode === 'kanban') showView('kanban');
+}
+
+// ─── RENDER ALL ──────────────────────────────────
+function renderAll() {
+  ['q1','q2','q3','q4'].forEach(q => {
+    const container = document.getElementById('cards-' + q);
+    if (!container) return;
+    container.innerHTML = '';
+    const qtasks = tasks.filter(t => t.quadrant === q);
+    qtasks.forEach(t => container.appendChild(buildCard(t)));
+    document.getElementById('cnt-' + q).textContent = qtasks.length;
+    const empty = document.getElementById('empty-' + q);
+    if (empty) empty.style.display = qtasks.length === 0 ? 'block' : 'none';
+  });
+
+  if (currentView === 'kanban') renderKanban();
+  if (currentView === 'briefing') renderBriefing();
+  if (currentView === 'groom') renderGroom();
+
+  updateGroomBadge();
+}
+
+function updateGroomBadge() {
+  const count = getGroomPendingCount();
+  ['groomBadge','groomBadgeHeader'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (count > 0) { el.style.display = 'block'; el.textContent = count; }
+    else el.style.display = 'none';
+  });
+}
+
+// ─── BUILD CARD ──────────────────────────────────
+function buildCard(task) {
+  const div = document.createElement('div');
+  const s = staleness(task);
+  div.className = 'card' + (s === 1 ? ' stale-1' : s === 2 ? ' stale-2' : '');
+  div.draggable = true;
+  div.dataset.id = task.id;
+  div.addEventListener('dragstart', e => onDragStart(e, task.id));
+  div.addEventListener('dragend', onDragEnd);
+
+  const sizeMap = { xs:'XS', s:'S', m:'M', l:'L', xl:'XL' };
+  const sl = staleLabel(task);
+
+  div.innerHTML = `
+    <div class="card-top">
+      <div class="card-title">${esc(task.title)}</div>
+      <span class="size-badge size-${task.size}">${sizeMap[task.size]}</span>
+    </div>
+    ${task.note ? `<div class="card-note">${esc(task.note)}</div>` : ''}
+    <div class="card-footer">
+      <div class="card-tags">
+        ${task.tag ? `<span class="tag">${esc(task.tag)}</span>` : ''}
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        ${sl ? `<span class="stale-badge">⏳ ${sl}</span>` : ''}
+        <div class="card-actions">
+          <button class="card-act-btn" onclick="openEdit('${task.id}')">edit</button>
+          <button class="card-act-btn del" onclick="deleteTask('${task.id}')">×</button>
+        </div>
+      </div>
+    </div>`;
+  return div;
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─── DRAG & DROP ─────────────────────────────────
+function onDragStart(e, id) {
+  draggedId = id;
+  setTimeout(() => e.target.classList.add('dragging'), 0);
+  e.dataTransfer.effectAllowed = 'move';
+}
+function onDragEnd(e) { e.target.classList.remove('dragging'); draggedId = null; }
+function onDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+function onDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+function onDrop(e, q) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  if (draggedId) {
+    const task = tasks.find(t => t.id === draggedId);
+    if (task && task.quadrant !== q) {
+      task.quadrant = q;
+      task.lastGroomed = Date.now();
+      saveData();
+      renderAll();
+    }
+  }
+}
+
+// ─── TASKS CRUD ──────────────────────────────────
+function deleteTask(id) {
+  tasks = tasks.filter(t => t.id !== id);
+  saveData();
+  renderAll();
+}
+
+function openEdit(id) {
+  const t = tasks.find(x => x.id === id);
+  if (!t) return;
+  document.getElementById('editId').value = id;
+  document.getElementById('editTitle').value = t.title;
+  document.getElementById('editNote').value = t.note || '';
+  document.getElementById('editSize').value = t.size;
+  document.getElementById('editTag').value = t.tag || '';
+  selectQ(t.quadrant, 'editQuadrantSelect');
+  document.getElementById('editModal').classList.add('open');
+}
+
+function saveEdit() {
+  const id = document.getElementById('editId').value;
+  const t = tasks.find(x => x.id === id);
+  if (!t) return;
+  t.title = document.getElementById('editTitle').value.trim();
+  t.note = document.getElementById('editNote').value.trim();
+  t.size = document.getElementById('editSize').value;
+  t.tag = document.getElementById('editTag').value.trim();
+  const sel = document.querySelector('#editQuadrantSelect .q-option.selected');
+  if (sel) t.quadrant = sel.dataset.q;
+  t.lastGroomed = Date.now();
+  saveData();
+  renderAll();
+  closeModal('editModal');
+}
+
+// ─── MODAL ───────────────────────────────────────
+function openModal() {
+  selectedAddQ = 'q2';
+  selectQ('q2', 'quadrantSelect');
+  document.getElementById('taskTitle').value = '';
+  document.getElementById('taskNote').value = '';
+  document.getElementById('taskTag').value = '';
+  document.getElementById('taskSize').value = 'm';
+  document.getElementById('addModal').classList.add('open');
+  setTimeout(() => document.getElementById('taskTitle').focus(), 300);
+}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function selectQ(q, containerId) {
+  document.querySelectorAll('#' + containerId + ' .q-option').forEach(el => {
+    el.classList.toggle('selected', el.dataset.q === q);
+  });
+  if (containerId === 'quadrantSelect') selectedAddQ = q;
+}
+
+function saveTask() {
+  const title = document.getElementById('taskTitle').value.trim();
+  if (!title) return;
+  tasks.push({
+    id: uid(),
+    title,
+    note: document.getElementById('taskNote').value.trim(),
+    size: document.getElementById('taskSize').value,
+    tag: document.getElementById('taskTag').value.trim(),
+    quadrant: selectedAddQ,
+    createdAt: Date.now(),
+    lastGroomed: Date.now(),
+  });
+  saveData();
+  renderAll();
+  closeModal('addModal');
+}
+
+// ─── VIEW SWITCHING ──────────────────────────────
+function showView(name) {
+  currentView = name;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const viewEl = document.getElementById(name + 'View');
+  if (viewEl) viewEl.classList.add('active');
+  const navEl = document.getElementById('nav-' + name);
+  if (navEl) navEl.classList.add('active');
+
+  if (name === 'kanban') renderKanban();
+  else if (name === 'briefing') renderBriefing();
+  else if (name === 'groom') renderGroom();
+
+  // Update URL without reload for Pepper deep-linking
+  const url = new URL(window.location);
+  if (name !== 'matrix') url.searchParams.set('mode', name);
+  else url.searchParams.delete('mode');
+  window.history.replaceState({}, '', url);
+}
+
+// ─── KANBAN RENDER ───────────────────────────────
+function renderKanban() {
+  const cols = [
+    { q: 'q1', label: 'Do First', emoji: '🔥' },
+    { q: 'q2', label: 'Plan', emoji: '📋' },
+    { q: 'q3', label: 'Delegate', emoji: '→' },
+    { q: 'q4', label: 'Someday', emoji: '☁' },
+  ];
+  const container = document.getElementById('kanbanCols');
+  container.innerHTML = '';
+  cols.forEach(({ q, label, emoji }) => {
+    const qtasks = tasks.filter(t => t.quadrant === q);
+    const col = document.createElement('div');
+    col.className = 'kanban-col';
+    col.innerHTML = `
+      <div class="kanban-col-header">
+        <span>${emoji} ${label}</span>
+        <span class="q-count">${qtasks.length}</span>
+      </div>
+      <div class="cards-container" id="kcards-${q}"></div>
+    `;
+    container.appendChild(col);
+    const cc = col.querySelector('#kcards-' + q);
+    qtasks.forEach(t => cc.appendChild(buildCard(t)));
+  });
+}
+
+// ─── BRIEFING RENDER ─────────────────────────────
+function renderBriefing() {
+  const now = new Date();
+  const hour = now.getHours();
+  const greeting = hour < 12 ? 'Morning Briefing' : hour < 17 ? 'Afternoon Briefing' : 'Evening Briefing';
+  document.getElementById('briefingGreeting').textContent = greeting;
+  document.getElementById('briefingDate').textContent = now.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
+
+  const q1 = tasks.filter(t => t.quadrant === 'q1');
+  const q2 = tasks.filter(t => t.quadrant === 'q2');
+  const stale = tasks.filter(t => staleness(t) >= 1);
+  const total = tasks.length;
+  const groomedToday = Object.keys(groomSessions).filter(k => k.startsWith(todayKey('AM').slice(0,-3))).length;
+
+  const el = document.getElementById('briefingContent');
+  el.innerHTML = '';
+
+  // Stats
+  const statsHtml = `
+    <div class="briefing-stats">
+      <div class="stat-card">
+        <div class="stat-num">${total}</div>
+        <div class="stat-label">Total Items</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">${q1.length}</div>
+        <div class="stat-label">Do First</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">${stale.length}</div>
+        <div class="stat-label" style="color:${stale.length>0?'var(--gold)':'var(--muted)'}">Need Groom</div>
+      </div>
+    </div>
+  `;
+
+  // Stale warning
+  const staleHtml = stale.length > 0 ? `
+    <div class="stale-warning">
+      <strong>⏳ ${stale.length} item${stale.length>1?'s':''}</strong> haven't been reviewed in 3+ days.
+      <button onclick="showView('groom')" style="margin-left:8px;padding:3px 10px;background:var(--gold);color:white;border:none;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer">Groom now</button>
+    </div>
+  ` : '';
+
+  // Do First section
+  const doFirstHtml = q1.length ? `
+    <div class="briefing-section">
+      <h3>Do First</h3>
+      ${q1.map(t => `
+        <div class="briefing-card">
+          <div class="bc-dot bc-q1"></div>
+          <div>
+            <div class="bc-title">${esc(t.title)}</div>
+            <div class="bc-meta">
+              <span class="size-badge size-${t.size}">${t.size.toUpperCase()}</span>
+              ${t.tag ? `<span class="tag">${esc(t.tag)}</span>` : ''}
+              ${staleLabel(t) ? `<span class="stale-badge">⏳ ${staleLabel(t)}</span>` : ''}
+            </div>
+          </div>
+        </div>`).join('')}
+    </div>` : '';
+
+  // Plan section (top 3 by recency)
+  const planTasks = [...q2].sort((a,b) => b.createdAt - a.createdAt).slice(0, 3);
+  const planHtml = planTasks.length ? `
+    <div class="briefing-section">
+      <h3>On the Horizon</h3>
+      ${planTasks.map(t => `
+        <div class="briefing-card">
+          <div class="bc-dot bc-q2"></div>
+          <div>
+            <div class="bc-title">${esc(t.title)}</div>
+            <div class="bc-meta">
+              <span class="size-badge size-${t.size}">${t.size.toUpperCase()}</span>
+              ${t.tag ? `<span class="tag">${esc(t.tag)}</span>` : ''}
+            </div>
+          </div>
+        </div>`).join('')}
+    </div>` : '';
+
+  // Pepper deep-link box
+  const pepperLinksHtml = `
+    <div style="background:var(--paper);border-radius:10px;padding:14px;border:1px solid var(--tan);margin-top:4px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Pepper Quick Links</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="showView('groom')" style="padding:7px 14px;background:var(--sage);color:white;border:none;border-radius:6px;font-family:'Lato',sans-serif;font-size:12px;font-weight:700;cursor:pointer">🌿 Start Grooming</button>
+        <button onclick="openModal()" style="padding:7px 14px;background:var(--rust);color:white;border:none;border-radius:6px;font-family:'Lato',sans-serif;font-size:12px;font-weight:700;cursor:pointer">＋ Add Task</button>
+      </div>
+    </div>
+  `;
+
+  el.innerHTML = statsHtml + staleHtml + doFirstHtml + planHtml + pepperLinksHtml;
+}
+
+// ─── GROOM BANNER ────────────────────────────────
+function checkGroomBanner() {
+  const banner = document.getElementById('pepperBanner');
+  if (!banner) return;
+  const staleCount = getGroomPendingCount();
+  const shouldShow = shouldShowGroomBanner() || staleCount > 0;
+
+  if (!shouldShow) { banner.style.display = 'none'; return; }
+
+  const slot = currentGroomSlot();
+  const slotLabel = slot === 'AM' ? 'Morning' : 'Afternoon';
+  const msg = staleCount > 0
+    ? `${staleCount} item${staleCount>1?'s':''} need your attention. Ready to groom?`
+    : `${slotLabel} grooming session is due. Takes 2 minutes.`;
+
+  banner.style.display = 'block';
+  banner.innerHTML = `
+    <div class="pepper-banner">
+      <div class="banner-tag">☕ Pepper · ${slotLabel} Grooming</div>
+      <div class="banner-msg">${msg}</div>
+      <div class="banner-actions">
+        <button class="banner-btn primary" onclick="showView('groom')">Start Now</button>
+        <button class="banner-btn secondary" onclick="document.getElementById('pepperBanner').style.display='none'">Later</button>
+      </div>
+    </div>`;
+}
+
+// ─── GROOMING ENGINE ─────────────────────────────
+function buildGroomQueue() {
+  // Priority: stale items first, then all items for a full session
+  const stale = tasks.filter(t => staleness(t) >= 1).sort((a,b) => daysSince(a.lastGroomed) - daysSince(b.lastGroomed));
+  const fresh = tasks.filter(t => staleness(t) === 0);
+  return [...stale, ...fresh];
+}
+
+function renderGroom() {
+  const el = document.getElementById('groomContent');
+  if (!groomQueue.length || groomIdx === 0) {
+    groomQueue = buildGroomQueue();
+    groomIdx = 0;
+  }
+
+  if (!groomQueue.length) {
+    el.innerHTML = `
+      <div class="groom-done">
+        <div class="check">✨</div>
+        <h3>Nothing to groom!</h3>
+        <p>Add some tasks to get started.</p>
+        <button onclick="openModal()">＋ Add Task</button>
+      </div>`;
+    return;
+  }
+
+  if (groomIdx >= groomQueue.length) {
+    // Done!
+    const slot = currentGroomSlot();
+    groomSessions[todayKey(slot)] = Date.now();
+    saveGroomSessions();
+    updateGroomBadge();
+    el.innerHTML = `
+      <div class="groom-done">
+        <div class="check">🌿</div>
+        <h3>Backlog groomed.</h3>
+        <p>You reviewed ${groomQueue.length} item${groomQueue.length>1?'s':''}. Next session ${slot==='AM'?'this afternoon':'tomorrow morning'}.</p>
+        <button onclick="showView('matrix')">Back to Board</button>
+      </div>`;
+    return;
+  }
+
+  const task = groomQueue[groomIdx];
+  if (!task) { groomIdx++; renderGroom(); return; }
+
+  groomTempQ = task.quadrant;
+  groomTempSize = task.size;
+  const progress = Math.round((groomIdx / groomQueue.length) * 100);
+  const s = staleness(task);
+  const sl = staleLabel(task);
+
+  el.innerHTML = `
+    <div class="groom-progress">
+      <div class="groom-progress-bar"><div class="groom-progress-fill" style="width:${progress}%"></div></div>
+      <div class="groom-progress-label">${groomIdx + 1} of ${groomQueue.length} · ${groomQueue.length - groomIdx - 1} remaining</div>
+    </div>
+    <div class="groom-card-container">
+      <div class="groom-card">
+        ${s > 0 ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:${s===2?'var(--rust)':'var(--gold)'};letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">⏳ Last seen ${sl} ago</div>` : ''}
+        <div class="groom-card-title">${esc(task.title)}</div>
+        ${task.note ? `<div class="groom-card-note">${esc(task.note)}</div>` : ''}
+
+        <div class="groom-section-label">Still the right quadrant?</div>
+        <div class="groom-q-grid" id="groomQGrid">
+          <div class="groom-q-opt q2${task.quadrant==='q2'?' selected':''}" onclick="setGroomQ('q2')">Plan & Build<br><small style="font-weight:400">Imp · Not Urgent</small></div>
+          <div class="groom-q-opt q1${task.quadrant==='q1'?' selected':''}" onclick="setGroomQ('q1')">Do First<br><small style="font-weight:400">Imp · Urgent</small></div>
+          <div class="groom-q-opt q4${task.quadrant==='q4'?' selected':''}" onclick="setGroomQ('q4')">Someday<br><small style="font-weight:400">Low stakes</small></div>
+          <div class="groom-q-opt q3${task.quadrant==='q3'?' selected':''}" onclick="setGroomQ('q3')">Delegate<br><small style="font-weight:400">Urg · Not Imp</small></div>
+        </div>
+
+        <div class="groom-section-label">Resize?</div>
+        <div class="groom-size-row" id="groomSizeRow">
+          ${['xs','s','m','l','xl'].map(sz => `
+            <div class="groom-size-opt${task.size===sz?' selected':''}" onclick="setGroomSize('${sz}')">${sz.toUpperCase()}</div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="groom-actions">
+        <button class="groom-btn skip" onclick="groomSkip()">Skip</button>
+        <button class="groom-btn drop" onclick="groomDrop()">Drop it</button>
+        <button class="groom-btn confirm" onclick="groomConfirm()">✓ Confirm</button>
+      </div>
+    </div>`;
+}
+
+function setGroomQ(q) {
+  groomTempQ = q;
+  document.querySelectorAll('#groomQGrid .groom-q-opt').forEach(el => {
+    el.classList.toggle('selected', el.classList.contains(q));
+  });
+}
+
+function setGroomSize(sz) {
+  groomTempSize = sz;
+  document.querySelectorAll('#groomSizeRow .groom-size-opt').forEach(el => {
+    el.classList.toggle('selected', el.textContent.trim().toLowerCase() === sz);
+  });
+}
+
+function groomConfirm() {
+  const task = groomQueue[groomIdx];
+  if (!task) { groomIdx++; renderGroom(); return; }
+  task.quadrant = groomTempQ || task.quadrant;
+  task.size = groomTempSize || task.size;
+  task.lastGroomed = Date.now();
+  groomIdx++;
+  saveData();
+  renderGroom();
+}
+
+function groomSkip() {
+  groomIdx++;
+  renderGroom();
+}
+
+function groomDrop() {
+  const task = groomQueue[groomIdx];
+  if (!task) { groomIdx++; renderGroom(); return; }
+  tasks = tasks.filter(t => t.id !== task.id);
+  groomIdx++;
+  saveData();
+  renderGroom();
+}
+
+// ─── INIT ─────────────────────────────────────────
+// Close modals on overlay click
+['addModal','editModal'].forEach(id => {
+  document.getElementById(id).addEventListener('click', function(e) {
+    if (e.target === this) closeModal(id);
+  });
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeModal('addModal'); closeModal('editModal'); }
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); openModal(); }
+});
+
+loadData();
+</script>
+</body>
+</html>
