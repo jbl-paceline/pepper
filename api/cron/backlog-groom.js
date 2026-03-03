@@ -8,7 +8,7 @@
  * Add the cron schedule to vercel.json
  */
 
-const BACKLOG_URL = 'https://pepper-backlog.vercel.app';
+const BACKLOG_URL = 'https://pep-love.vercel.app/backlog';
 const SLACK_USER_ID = process.env.SLACK_USER_ID; // your DM channel/user ID
 const SLACK_BOT_TOKEN = process.env.SLACK_BOT_TOKEN;
 

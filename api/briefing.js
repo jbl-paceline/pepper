@@ -134,18 +134,18 @@ export default async function handler(req, res) {
           {
             type: 'button',
             text: { type: 'plain_text', text: '☀️ Briefing', emoji: true },
-            url: 'https://pepper-backlog.vercel.app?mode=briefing',
+            url: 'https://pep-love.vercel.app/backlog?mode=briefing',
             style: 'primary',
           },
           {
             type: 'button',
             text: { type: 'plain_text', text: '🌿 Morning Groom', emoji: true },
-            url: 'https://pepper-backlog.vercel.app?mode=groom',
+            url: 'https://pep-love.vercel.app/backlog?mode=groom',
           },
           {
             type: 'button',
             text: { type: 'plain_text', text: '＋ Add Task', emoji: true },
-            url: 'https://pepper-backlog.vercel.app',
+            url: 'https://pep-love.vercel.app/backlog',
           },
         ],
       },
