@@ -15,11 +15,10 @@ Top priorities:
 
 Team (Slack-first):
 - Sam Luff - product/strategy
-- Dave Sharp - insurance project manager
-- Stan Liang - product manager
 - Colin Miiller - engineering
 - Catherine Nally - brand/marketing
 - James Hale - data/research
+- Salil Singh - data science
 - Heather Shetrawski - customer support
 - Katrina Chanco - design/product
 - Anil Lodhia - design
