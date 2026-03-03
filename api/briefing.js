@@ -1,6 +1,7 @@
 // Pepper - Daily Briefing Cron
 import { getSlackContext } from './slack-context.js';
 import { getCalendarContext } from './google-calendar.js';
+import { getGmailContext } from './gmail.js';
 
 const SYSTEM_PROMPT = `You are Pepper, the Chief of Staff to John B Lin, COO of Paceline (paceline.fit). You are a trusted senior operator.
 
@@ -14,10 +15,11 @@ Top priorities:
 
 Team (Slack-first):
 - Sam Luff - product/strategy
+- Dave Sharp - insurance project manager
+- Stan Liang - product manager
 - Colin Miiller - engineering
 - Catherine Nally - brand/marketing
 - James Hale - data/research
-- Salil Singh - data science
 - Heather Shetrawski - customer support
 - Katrina Chanco - design/product
 - Anil Lodhia - design
@@ -27,7 +29,7 @@ ELT: Joel, Tom, Terry, Tyler (email-first), Nick Wright (CMO/Chief Commercial, J
 
 ELT materials protocol: Substantive ELT materials need a pre-read summary OR must be sent 1 business day in advance. Always flag this lead time.
 
-Base the briefing on real Slack and Calendar context provided. Reference real people, conversations, and meetings. Don't fabricate.`;
+Base the briefing entirely on real Slack, Calendar, and Gmail context provided. Reference real people, conversations, meetings, and email threads. Don't fabricate anything not in the data.`;
 
 export default async function handler(req, res) {
   const authHeader = req.headers['authorization'];
@@ -36,10 +38,11 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Pull live context in parallel
-    const [slackContext, calendarContext] = await Promise.all([
+    // Pull all context in parallel
+    const [slackContext, calendarContext, gmailContext] = await Promise.all([
       getSlackContext(8, 20),
       getCalendarContext(3),
+      getGmailContext(10),
     ]);
 
     const today = new Date().toLocaleDateString('en-US', {
@@ -54,7 +57,10 @@ ${slackContext}
 UPCOMING CALENDAR (next 3 days):
 ${calendarContext}
 
-Based on this real data, generate the briefing. Reference specific people, threads, meetings, and decisions. For the Schedule Snapshot, use the actual calendar events. Flag any ELT meetings that need a pre-read prepared today. Don't fabricate anything not in the data.
+RECENT EMAIL (unread + ELT threads):
+${gmailContext}
+
+Based on this real data, generate the briefing. Reference specific people, threads, meetings, and email threads. For the Schedule Snapshot use actual calendar events. Flag ELT meetings needing pre-reads. Surface stale email threads that need a reply. Don't fabricate anything not in the data.
 
 Format for Slack - keep bullets to 1-2 lines, no preamble:
 
