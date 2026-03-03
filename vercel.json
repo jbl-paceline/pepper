@@ -12,5 +12,9 @@
       "path": "/api/cron/backlog-groom",
       "schedule": "0 22 * * 1-5"
     }
+  ],
+  "rewrites": [
+    { "source": "/backlog", "destination": "/public/backlog.html" },
+    { "source": "/backlog/(.*)", "destination": "/public/backlog.html" }
   ]
 }
