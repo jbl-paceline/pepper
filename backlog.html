@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#f5f0e8">
 <title>Pepper Backlog</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=IBM+Plex+Mono:wght@400;500&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=IBM+Plex+Mono:wght@400;500&family=Lato:wght@300;400;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -973,6 +973,269 @@ textarea { resize: none; height: 68px; }
   .modal-overlay.open { align-items: center; }
   .groom-card-container { max-width: 420px; }
 }
+
+/* ─── THEME: HARPER COLLINS ──────────────────────────────────────────────── */
+[data-theme="harper"] {
+  --cream: #f9f7f4;
+  --warm-white: #ffffff;
+  --paper: #f2efe9;
+  --tan: #d8d0c4;
+  --brown: #666053;
+  --dark-brown: #1a1814;
+  --rust: #1a1814;
+  --sage: #4a4640;
+  --ink: #1a1814;
+  --muted: #9a9088;
+  --gold: #333030;
+  --dust: #666053;
+  --q1-bg: #f5f3ef; --q1-accent: #1a1814;
+  --q2-bg: #f2f0ec; --q2-accent: #4a4640;
+  --q3-bg: #f7f5f1; --q3-accent: #666053;
+  --q4-bg: #f0ede8; --q4-accent: #9a9088;
+}
+[data-theme="harper"] body { font-family: 'EB Garamond', Georgia, serif; }
+[data-theme="harper"] .logo h1 { font-family: 'EB Garamond', Georgia, serif; font-size: 20px; letter-spacing: 0.5px; }
+[data-theme="harper"] .logo .sub { font-family: 'EB Garamond', serif; font-style: italic; letter-spacing: 0.5px; text-transform: none; font-size: 11px; }
+[data-theme="harper"] .card-title { font-family: 'EB Garamond', serif; font-size: 15px; line-height: 1.4; }
+[data-theme="harper"] .quadrant-label { font-family: 'EB Garamond', serif; font-style: italic; font-size: 13px; letter-spacing: 0; }
+[data-theme="harper"] .quadrant-sub { font-family: 'EB Garamond', serif; font-style: italic; }
+[data-theme="harper"] .add-btn { background: #1a1814; border-radius: 3px; letter-spacing: 0.5px; }
+[data-theme="harper"] .add-btn:active { background: #333; }
+[data-theme="harper"] .icon-btn { border-radius: 3px; }
+[data-theme="harper"] .card { border-radius: 3px; border-left: 3px solid var(--tan); box-shadow: none; }
+[data-theme="harper"] .size-badge { font-family: 'EB Garamond', serif; font-style: italic; border-radius: 2px; }
+[data-theme="harper"] .nav-item { font-family: 'EB Garamond', serif; font-style: italic; font-size: 13px; }
+[data-theme="harper"] .modal-sheet { border-radius: 4px 4px 0 0; }
+[data-theme="harper"] .btn-save { border-radius: 3px; background: #1a1814; }
+[data-theme="harper"] .btn-delete { border-radius: 3px; }
+[data-theme="harper"] body::before { opacity: 0; }
+
+/* ─── THEME: HACKER TERMINAL ─────────────────────────────────────────────── */
+[data-theme="terminal"] {
+  --cream: #0a0e0a;
+  --warm-white: #0d120d;
+  --paper: #0f140f;
+  --tan: #1a2e1a;
+  --brown: #00aa33;
+  --dark-brown: #00ff41;
+  --rust: #00ff41;
+  --sage: #00cc33;
+  --ink: #00ff41;
+  --muted: #007722;
+  --gold: #00cc33;
+  --dust: #00aa33;
+  --q1-bg: #0d160d; --q1-accent: #00ff41;
+  --q2-bg: #0a130a; --q2-accent: #00cc33;
+  --q3-bg: #0c150c; --q3-accent: #009922;
+  --q4-bg: #0b140b; --q4-accent: #007722;
+}
+[data-theme="terminal"] body {
+  font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace;
+  background: #0a0e0a;
+}
+[data-theme="terminal"] body::before {
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,255,65,0.015) 2px,
+    rgba(0,255,65,0.015) 4px
+  );
+  pointer-events: none;
+}
+[data-theme="terminal"] header {
+  background: rgba(10,14,10,0.97);
+  border-bottom: 1px solid #00ff41;
+}
+[data-theme="terminal"] .logo h1 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #00ff41;
+  text-shadow: 0 0 8px rgba(0,255,65,0.6);
+}
+[data-theme="terminal"] .logo .sub {
+  font-family: 'JetBrains Mono', monospace;
+  color: #007722;
+  font-size: 8px;
+}
+[data-theme="terminal"] .card {
+  border-radius: 2px;
+  border: 1px solid #1a2e1a;
+  border-left: 2px solid #00ff41;
+  box-shadow: none;
+  background: #0d120d;
+}
+[data-theme="terminal"] .card:active { border-color: #00ff41; box-shadow: 0 0 8px rgba(0,255,65,0.2); }
+[data-theme="terminal"] .card-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: #00ff41;
+  text-shadow: 0 0 6px rgba(0,255,65,0.4);
+}
+[data-theme="terminal"] .card-note { color: #007722; font-family: 'JetBrains Mono', monospace; font-size: 10px; }
+[data-theme="terminal"] .size-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  border: 1px solid #1a2e1a;
+  border-radius: 2px;
+  background: transparent;
+  color: #00aa33;
+}
+[data-theme="terminal"] .quadrant-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #00ff41;
+  text-shadow: 0 0 6px rgba(0,255,65,0.4);
+}
+[data-theme="terminal"] .quadrant-sub { font-family: 'JetBrains Mono', monospace; font-size: 8px; color: #007722; }
+[data-theme="terminal"] .quadrant-col { border: 1px solid #1a2e1a; border-radius: 2px; }
+[data-theme="terminal"] .add-btn {
+  background: transparent;
+  border: 1px solid #00ff41;
+  color: #00ff41;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  border-radius: 2px;
+  text-shadow: 0 0 6px rgba(0,255,65,0.4);
+  box-shadow: 0 0 8px rgba(0,255,65,0.1);
+}
+[data-theme="terminal"] .add-btn:active { background: #00ff41; color: #0a0e0a; }
+[data-theme="terminal"] .icon-btn {
+  background: transparent;
+  border: 1px solid #1a2e1a;
+  border-radius: 2px;
+  color: #00aa33;
+}
+[data-theme="terminal"] .icon-btn:active { border-color: #00ff41; color: #00ff41; }
+[data-theme="terminal"] .nav-bar {
+  border-top: 1px solid #00ff41;
+  background: rgba(10,14,10,0.97);
+}
+[data-theme="terminal"] .nav-item { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #007722; }
+[data-theme="terminal"] .nav-item.active { color: #00ff41; text-shadow: 0 0 6px rgba(0,255,65,0.5); }
+[data-theme="terminal"] .modal-sheet {
+  background: #0d120d;
+  border: 1px solid #00ff41;
+  border-bottom: none;
+  border-radius: 2px 2px 0 0;
+}
+[data-theme="terminal"] .modal-title { font-family: 'JetBrains Mono', monospace; color: #00ff41; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; }
+[data-theme="terminal"] .form-group label { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1px; color: #007722; text-transform: uppercase; }
+[data-theme="terminal"] .form-group input,
+[data-theme="terminal"] .form-group textarea,
+[data-theme="terminal"] .form-group select {
+  background: #0a0e0a;
+  border: 1px solid #1a2e1a;
+  border-radius: 2px;
+  color: #00ff41;
+  font-family: 'JetBrains Mono', monospace;
+}
+[data-theme="terminal"] .form-group input:focus,
+[data-theme="terminal"] .form-group textarea:focus { border-color: #00ff41; box-shadow: 0 0 6px rgba(0,255,65,0.2); }
+[data-theme="terminal"] .btn-save { background: #00ff41; color: #0a0e0a; border-radius: 2px; font-family: 'JetBrains Mono', monospace; font-weight: 700; }
+[data-theme="terminal"] .btn-cancel { border: 1px solid #1a2e1a; color: #007722; border-radius: 2px; font-family: 'JetBrains Mono', monospace; }
+[data-theme="terminal"] .btn-delete { border: 1px solid #ff4141; color: #ff4141; border-radius: 2px; font-family: 'JetBrains Mono', monospace; }
+[data-theme="terminal"] .stale-badge { font-family: 'JetBrains Mono', monospace; font-size: 8px; }
+[data-theme="terminal"] .tag { font-family: 'JetBrains Mono', monospace; font-size: 8px; border-radius: 2px; }
+[data-theme="terminal"] .pepper-banner {
+  background: #0d120d;
+  border: 1px solid #00ff41;
+  border-radius: 2px;
+}
+[data-theme="terminal"] .banner-msg { font-family: 'JetBrains Mono', monospace; font-style: normal; font-size: 12px; color: #00ff41; }
+[data-theme="terminal"] .banner-tag { color: #007722; }
+[data-theme="terminal"] .banner-btn { border-radius: 2px; font-family: 'JetBrains Mono', monospace; font-size: 10px; }
+
+/* ─── THEME PICKER ───────────────────────────────────────────────────────── */
+.theme-picker-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 200;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+}
+.theme-picker-overlay.open { display: flex; }
+.theme-picker-sheet {
+  background: var(--warm-white);
+  border-radius: 16px 16px 0 0;
+  padding: 20px 20px calc(20px + var(--safe-bottom));
+  width: 100%;
+  max-width: 500px;
+}
+[data-theme="terminal"] .theme-picker-sheet { background: #0d120d; border: 1px solid #00ff41; border-bottom: none; border-radius: 2px 2px 0 0; }
+[data-theme="harper"] .theme-picker-sheet { border-radius: 4px 4px 0 0; }
+.theme-picker-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+[data-theme="terminal"] .theme-picker-title { font-family: 'JetBrains Mono', monospace; color: #007722; }
+[data-theme="harper"] .theme-picker-title { font-family: 'EB Garamond', serif; font-style: italic; text-transform: none; letter-spacing: 0; font-size: 13px; }
+.theme-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.theme-opt {
+  border: 2px solid var(--tan);
+  border-radius: 10px;
+  padding: 12px 8px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+  background: var(--paper);
+}
+.theme-opt.active { border-color: var(--rust); }
+.theme-opt-preview {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  margin: 0 auto 8px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  padding: 3px;
+}
+.theme-opt-preview span {
+  border-radius: 2px;
+  display: block;
+}
+.theme-opt-name {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  color: var(--dark-brown);
+}
+[data-theme="terminal"] .theme-opt { background: #0a0e0a; border-color: #1a2e1a; border-radius: 2px; }
+[data-theme="terminal"] .theme-opt.active { border-color: #00ff41; }
+[data-theme="terminal"] .theme-opt-name { font-family: 'JetBrains Mono', monospace; color: #00aa33; font-size: 8px; }
+[data-theme="harper"] .theme-opt { border-radius: 3px; }
+[data-theme="harper"] .theme-opt-name { font-family: 'EB Garamond', serif; font-size: 12px; }
+.theme-picker-close {
+  width: 100%;
+  padding: 12px;
+  background: var(--paper);
+  border: 1px solid var(--tan);
+  border-radius: 8px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  cursor: pointer;
+}
+[data-theme="terminal"] .theme-picker-close { background: transparent; border-color: #1a2e1a; color: #007722; border-radius: 2px; font-family: 'JetBrains Mono', monospace; }
+[data-theme="harper"] .theme-picker-close { border-radius: 3px; font-family: 'EB Garamond', serif; font-size: 13px; font-style: italic; }
+
 </style>
 </head>
 <body>
@@ -982,7 +1245,7 @@ textarea { resize: none; height: 68px; }
     <h1>Pepper Backlog</h1>
     <div class="sub" id="headerSub">Personal OS</div>
   </div>
-  <div class="header-right">
+  <div class="header-right"><button class="icon-btn" onclick="openThemePicker()" title="Theme" style="font-size:13px">◑</button>
     <div class="icon-btn" onclick="showView('groom')" title="Start Grooming" id="groomIconBtn" style="position:relative">
       🌿
       <span class="nav-badge" id="groomBadgeHeader" style="display:none"></span>
@@ -1210,6 +1473,7 @@ const SEEDS = [
 
 // ─── PERSISTENCE ──────────────────────────────────
 async function loadData() {
+  await loadTheme();
   try {
     const r = await window.storage.get(STORAGE_KEY);
     if (r && r.value) {
@@ -1794,6 +2058,92 @@ document.addEventListener('keydown', e => {
 });
 
 loadData();
+
+// ─── THEME SYSTEM ──────────────────────────────────────────────
+const THEMES = ['wellness', 'harper', 'terminal'];
+let currentTheme = 'wellness';
+
+function applyTheme(theme) {
+  currentTheme = theme;
+  if (theme === 'wellness') {
+    document.documentElement.removeAttribute('data-theme');
+  } else {
+    document.documentElement.setAttribute('data-theme', theme);
+  }
+  // Update meta theme-color
+  const colors = { wellness: '#f5f0e8', harper: '#f9f7f4', terminal: '#0a0e0a' };
+  document.querySelector('meta[name="theme-color"]').setAttribute('content', colors[theme]);
+  // Update active state in picker
+  document.querySelectorAll('.theme-opt').forEach(el => {
+    el.classList.toggle('active', el.dataset.themeOpt === theme);
+  });
+}
+
+function setTheme(theme) {
+  applyTheme(theme);
+  // Persist alongside tasks
+  try {
+    window.storage.get('pepper-theme').then(r => {}).catch(() => {});
+    window.storage.set('pepper-theme', theme);
+  } catch(e) {}
+}
+
+function openThemePicker() {
+  document.getElementById('themePicker').classList.add('open');
+}
+
+function closeThemePicker() {
+  document.getElementById('themePicker').classList.remove('open');
+}
+
+// Load saved theme on boot
+async function loadTheme() {
+  try {
+    const r = await window.storage.get('pepper-theme');
+    if (r && r.value && THEMES.includes(r.value)) {
+      applyTheme(r.value);
+    }
+  } catch(e) {}
+}
+
 </script>
+
+<!-- Theme Picker -->
+<div class="theme-picker-overlay" id="themePicker">
+  <div class="theme-picker-sheet">
+    <div class="theme-picker-title">Choose Theme</div>
+    <div class="theme-options">
+      <div class="theme-opt" data-theme-opt="wellness" onclick="setTheme('wellness')">
+        <div class="theme-opt-preview" style="background:#ede8dc">
+          <span style="background:#f8ece3"></span>
+          <span style="background:#eaf0e6"></span>
+          <span style="background:#fdf4e3"></span>
+          <span style="background:#ece8e0"></span>
+        </div>
+        <div class="theme-opt-name">Wellness</div>
+      </div>
+      <div class="theme-opt" data-theme-opt="harper" onclick="setTheme('harper')">
+        <div class="theme-opt-preview" style="background:#f2efe9">
+          <span style="background:#f5f3ef"></span>
+          <span style="background:#f2f0ec"></span>
+          <span style="background:#f7f5f1"></span>
+          <span style="background:#f0ede8"></span>
+        </div>
+        <div class="theme-opt-name">Harper</div>
+      </div>
+      <div class="theme-opt" data-theme-opt="terminal" onclick="setTheme('terminal')">
+        <div class="theme-opt-preview" style="background:#0a0e0a;border:1px solid #1a2e1a">
+          <span style="background:#0d160d;border:1px solid #00ff41"></span>
+          <span style="background:#0a130a;border:1px solid #00cc33"></span>
+          <span style="background:#0c150c;border:1px solid #009922"></span>
+          <span style="background:#0b140b;border:1px solid #007722"></span>
+        </div>
+        <div class="theme-opt-name" style="color:#00aa33">Terminal</div>
+      </div>
+    </div>
+    <button class="theme-picker-close" onclick="closeThemePicker()">Done</button>
+  </div>
+</div>
+
 </body>
 </html>
