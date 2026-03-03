@@ -56,7 +56,7 @@ export async function getSlackContext(maxChannels = 8, maxMessagesPerChannel = 2
             .map(m => {
               const time = new Date(parseFloat(m.ts) * 1000).toLocaleString('en-US', {
                 weekday: 'short', month: 'short', day: 'numeric',
-                hour: 'numeric', minute: '2-digit',
+                hour: 'numeric', minute: '2-digit', timeZone: 'America/Los_Angeles'
               });
               const name = userMap[m.user] || 'Unknown';
               return `  [${time}] ${name}: ${m.text.slice(0, 300)}`;
