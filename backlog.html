@@ -1491,7 +1491,7 @@ const SEEDS = [
 async function loadData() {
   await loadTheme();
   try {
-    const r = await window.storage.get(STORAGE_KEY);
+    const r = { value: localStorage.getItem(STORAGE_KEY) };
     if (r && r.value) {
       const parsed = JSON.parse(r.value);
       tasks = parsed.tasks || [];
@@ -1507,7 +1507,7 @@ async function loadData() {
     }));
   }
   try {
-    const r2 = await window.storage.get(GROOM_KEY);
+    const r2 = { value: localStorage.getItem(GROOM_KEY) };
     if (r2 && r2.value) groomSessions = JSON.parse(r2.value);
   } catch(e) {}
   renderAll();
@@ -1517,13 +1517,13 @@ async function loadData() {
 
 async function saveData() {
   try {
-    await window.storage.set(STORAGE_KEY, JSON.stringify({ tasks, version: 2 }));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ tasks, version: 2 }));
   } catch(e) { console.warn('Storage unavailable, changes not persisted'); }
 }
 
 async function saveGroomSessions() {
   try {
-    await window.storage.set(GROOM_KEY, JSON.stringify(groomSessions));
+    localStorage.setItem(GROOM_KEY, JSON.stringify(groomSessions));
   } catch(e) {}
 }
 
@@ -2099,8 +2099,8 @@ function setTheme(theme) {
   applyTheme(theme);
   // Persist alongside tasks
   try {
-    window.storage.get('pepper-theme').then(r => {}).catch(() => {});
-    window.storage.set('pepper-theme', theme);
+    
+    localStorage.setItem('pepper-theme', theme);
   } catch(e) {}
 }
 
@@ -2115,7 +2115,7 @@ function closeThemePicker() {
 // Load saved theme on boot
 async function loadTheme() {
   try {
-    const r = await window.storage.get('pepper-theme');
+    const r = { value: localStorage.getItem('pepper-theme') };
     if (r && r.value && THEMES.includes(r.value)) {
       applyTheme(r.value);
     }
