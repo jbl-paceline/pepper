@@ -14,7 +14,7 @@
     }
   ],
   "routes": [
-    { "src": "/backlog", "dest": "/public/backlog.html" },
+    { "src": "/backlog", "dest": "/backlog.html" },
     { "src": "/api/(.*)", "dest": "/api/$1" }
   ]
 }
