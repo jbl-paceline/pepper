@@ -47,8 +47,8 @@ export async function getCalendarContext(daysAhead = 3) {
 
       const startDate = new Date(start);
       const timeStr = event.start?.dateTime
-        ? startDate.toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
-        : startDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+        ? startDate.toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'America/Los_Angeles' })
+        : startDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'America/Los_Angeles' });
 
       const duration = event.start?.dateTime && event.end?.dateTime
         ? Math.round((new Date(end) - new Date(start)) / 60000) + ' min'
