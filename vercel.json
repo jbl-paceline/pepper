@@ -13,8 +13,8 @@
       "schedule": "0 22 * * 1-5"
     }
   ],
-  "rewrites": [
-    { "source": "/backlog", "destination": "/public/backlog.html" },
-    { "source": "/backlog/(.*)", "destination": "/public/backlog.html" }
+  "routes": [
+    { "src": "/backlog", "dest": "/public/backlog.html" },
+    { "src": "/api/(.*)", "dest": "/api/$1" }
   ]
 }
