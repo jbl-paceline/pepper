@@ -1020,7 +1020,7 @@ textarea { resize: none; height: 68px; }
   --dark-brown: #00ff41;
   --rust: #00ff41;
   --sage: #00cc33;
-  --ink: #00ff41;
+  --ink: #f0f0f0;
   --muted: #007722;
   --gold: #00cc33;
   --dust: #00aa33;
@@ -1085,14 +1085,30 @@ textarea { resize: none; height: 68px; }
   color: #00aa33;
 }
 [data-theme="terminal"] .quadrant-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  text-transform: none;
   color: #00ff41;
-  text-shadow: 0 0 6px rgba(0,255,65,0.4);
+  text-shadow: none;
 }
-[data-theme="terminal"] .quadrant-sub { font-family: 'JetBrains Mono', monospace; font-size: 8px; color: #007722; }
+[data-theme="terminal"] .quadrant.q1 .quadrant-label { color: #ff9500; }
+[data-theme="terminal"] .quadrant.q2 .quadrant-label { color: #64d2ff; }
+[data-theme="terminal"] .quadrant.q3 .quadrant-label { color: #ff6b6b; }
+[data-theme="terminal"] .quadrant.q4 .quadrant-label { color: #a89060; }
+[data-theme="terminal"] .quadrant-sub {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: #7a9e7a;
+}
+[data-theme="terminal"] .quadrant.q1 .quadrant-sub { color: rgba(255,149,0,0.55); }
+[data-theme="terminal"] .quadrant.q2 .quadrant-sub { color: rgba(100,210,255,0.5); }
+[data-theme="terminal"] .quadrant.q3 .quadrant-sub { color: rgba(255,107,107,0.45); }
+[data-theme="terminal"] .quadrant.q4 .quadrant-sub { color: rgba(168,144,96,0.55); }
 [data-theme="terminal"] .quadrant-col { border: 1px solid #1a2e1a; border-radius: 2px; }
 [data-theme="terminal"] .add-btn {
   background: transparent;
