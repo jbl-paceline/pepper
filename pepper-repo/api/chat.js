@@ -1,8 +1,4 @@
-export const config = { runtime: "edge" };
-
 const ALLOWED_ORIGIN = process.env.PEPPER_URL || "*";
-
-// ---- Google Calendar helpers ----
 
 async function getAccessToken() {
   const res = await fetch("https://oauth2.googleapis.com/token", {
@@ -46,45 +42,23 @@ async function getCalendarContext() {
     return `Upcoming calendar events (next 7 days, PT):\n${lines.join("\n")}`;
   } catch (err) {
     console.error("Calendar fetch error:", err);
-    return ""; // Fail silently
+    return "";
   }
 }
 
-// ---- Main handler ----
+export default async function handler(req, res) {
+  res.setHeader("Access-Control-Allow-Origin", ALLOWED_ORIGIN);
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-export default async function handler(req) {
-  if (req.method === "OPTIONS") {
-    return new Response(null, {
-      status: 204,
-      headers: {
-        "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
-        "Access-Control-Allow-Methods": "POST, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type",
-      },
-    });
-  }
+  if (req.method === "OPTIONS") return res.status(204).end();
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  if (req.method !== "POST") {
-    return new Response(JSON.stringify({ error: "Method not allowed" }), {
-      status: 405,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
-
-  let body;
-  try {
-    body = await req.json();
-  } catch {
-    return new Response(JSON.stringify({ error: "Invalid JSON" }), { status: 400 });
-  }
-
-  const { messages, system, max_tokens = 1024 } = body;
-
+  const { messages, system, max_tokens = 1024 } = req.body;
   if (!messages || !Array.isArray(messages)) {
-    return new Response(JSON.stringify({ error: "Missing messages array" }), { status: 400 });
+    return res.status(400).json({ error: "Missing messages array" });
   }
 
-  // Fetch live calendar context and inject into system prompt
   const calendarContext = await getCalendarContext();
   const enrichedSystem = calendarContext
     ? `${system || ""}\n\n--- LIVE CONTEXT ---\n${calendarContext}`
@@ -106,12 +80,5 @@ export default async function handler(req) {
   });
 
   const data = await anthropicRes.json();
-
-  return new Response(JSON.stringify(data), {
-    status: anthropicRes.status,
-    headers: {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
-    },
-  });
+  return res.status(anthropicRes.status).json(data);
 }
