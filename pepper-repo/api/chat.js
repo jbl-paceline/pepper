@@ -18,6 +18,8 @@ async function getAccessToken() {
 async function getCalendarContext() {
   try {
     const token = await getAccessToken();
+    console.log("GCal token fetch result:", token ? "got token" : "NO TOKEN");
+    
     const now = new Date();
     const timeMin = now.toISOString();
     const timeMax = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
@@ -29,6 +31,7 @@ async function getCalendarContext() {
       { headers: { Authorization: `Bearer ${token}` } }
     );
     const data = await res.json();
+    console.log("GCal API status:", res.status, "items:", data.items?.length, "error:", data.error?.message);
     if (!data.items?.length) return "No upcoming calendar events found.";
 
     const lines = data.items.map(e => {
@@ -41,7 +44,7 @@ async function getCalendarContext() {
     });
     return `Upcoming calendar events (next 7 days, PT):\n${lines.join("\n")}`;
   } catch (err) {
-    console.error("Calendar fetch error:", err);
+    console.error("Calendar fetch error:", err.message, err.stack);
     return "";
   }
 }
