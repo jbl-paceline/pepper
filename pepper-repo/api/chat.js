@@ -54,7 +54,19 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(204).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  const { messages, system, max_tokens = 1024 } = req.body;
+let parsedBody;
+try {
+  const raw = await new Promise((resolve, reject) => {
+    let data = '';
+    req.on('data', chunk => data += chunk);
+    req.on('end', () => resolve(data));
+    req.on('error', reject);
+  });
+  parsedBody = JSON.parse(raw);
+} catch {
+  return res.status(400).json({ error: "Invalid JSON" });
+}
+const { messages, system, max_tokens = 1024 } = parsedBody;
   if (!messages || !Array.isArray(messages)) {
     return res.status(400).json({ error: "Missing messages array" });
   }
